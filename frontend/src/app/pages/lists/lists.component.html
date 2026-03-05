@@ -1,0 +1,55 @@
+<div class="max-w-6xl mx-auto pt-8 pb-20">
+
+    <div class="flex justify-between items-end mb-12 border-b border-gray-200 pb-4">
+        <div>
+            <h1 class="text-3xl font-black text-gray-900 mb-2">My Lists</h1>
+            <p class="text-gray-500 text-sm font-bold tracking-widest uppercase">
+                Compile and share your film collections
+            </p>
+        </div>
+
+        <button *ngIf="isLoggedIn" (click)="showCreateForm = !showCreateForm"
+            class="bg-figma-yellow text-black font-bold text-xs tracking-widest uppercase px-6 py-3 rounded-xl hover:scale-105 transition-transform shadow-sm">
+            + Start a new list
+        </button>
+    </div>
+
+    <div *ngIf="!isLoggedIn" class="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200">
+        <p class="text-gray-500 font-serif mb-4">You must be logged in to create and view your lists.</p>
+        <a routerLink="/login"
+            class="inline-block bg-black text-white font-bold text-xs tracking-widest uppercase px-6 py-3 rounded-xl hover:bg-gray-800 transition-colors">Sign
+            In</a>
+    </div>
+
+    <div *ngIf="showCreateForm"
+        class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 mb-12 max-w-2xl mx-auto">
+        <h3 class="text-lg font-black mb-6">Create a New List</h3>
+
+        <label class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Name of the list</label>
+        <input type="text" [(ngModel)]="newListTitle" placeholder="e.g. Best Horror Movies of 2024"
+            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 mb-6 outline-none focus:ring-2 focus:ring-figma-yellow">
+
+        <label class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Description
+            (optional)</label>
+        <textarea [(ngModel)]="newListDesc" rows="3"
+            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 mb-6 outline-none focus:ring-2 focus:ring-figma-yellow"></textarea>
+
+        <div class="flex gap-4">
+            <button (click)="createNewList()"
+                class="flex-1 bg-figma-green text-black font-bold text-xs tracking-widest uppercase py-3 rounded-lg hover:brightness-110 transition-all">Save
+                List</button>
+            <button (click)="showCreateForm = false"
+                class="flex-1 bg-gray-200 text-gray-700 font-bold text-xs tracking-widest uppercase py-3 rounded-lg hover:bg-gray-300 transition-all">Cancel</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let list of myLists" [routerLink]="['/lists', list.id]"
+            class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-figma-yellow transition-all cursor-pointer group">
+            <h3 class="text-xl font-black text-gray-900 mb-2 group-hover:text-figma-yellow transition-colors">{{
+                list.title }}</h3>
+            <p class="text-sm text-gray-500 font-serif line-clamp-2">{{ list.description || 'No description.' }}</p>
+        </div>
+    </div>
+
+</div>

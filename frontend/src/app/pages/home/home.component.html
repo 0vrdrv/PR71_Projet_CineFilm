@@ -1,0 +1,107 @@
+<div class="pb-20">
+
+    <div *ngIf="heroMovie" [routerLink]="['/films', heroMovie.id]"
+        class="relative w-full h-[70vh] min-h-[500px] rounded-3xl overflow-hidden mb-16 shadow-2xl cursor-pointer group">
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+            [style.background-image]="'url(https://image.tmdb.org/t/p/original' + heroMovie.backdrop_path + ')'"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent"></div>
+
+        <div class="absolute bottom-12 left-8 md:bottom-20 md:left-20 text-white max-w-3xl z-10">
+            <span
+                class="bg-figma-yellow text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded mb-4 inline-block shadow-lg">Featured
+                Film</span>
+            <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight drop-shadow-md">{{
+                heroMovie.title }}</h1>
+            <p class="text-lg text-gray-300 line-clamp-3 font-serif leading-relaxed">{{ heroMovie.overview }}</p>
+        </div>
+    </div>
+
+    <div
+        class="bg-figma-yellow rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between mb-20 shadow-sm border border-yellow-200">
+        <div>
+            <h2 class="text-3xl md:text-4xl font-black text-black mb-2 tracking-tight">Track films you've watched.</h2>
+            <p class="text-gray-800 text-lg font-serif">Save those you want to see. Tell your friends what's good.</p>
+        </div>
+        <a routerLink="/register"
+            class="mt-6 md:mt-0 bg-black text-white px-8 py-4 rounded-xl font-bold text-xs tracking-widest uppercase hover:scale-105 hover:shadow-xl transition-all cursor-pointer whitespace-nowrap">
+            Get started - It's free
+        </a>
+    </div>
+
+    <div class="mb-24">
+        <h2 class="text-xs font-bold tracking-widest uppercase mb-8 text-gray-400 border-b border-gray-200 pb-3">
+            Letterboxd lets you...</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div
+                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
+                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                        <path fill-rule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-gray-900 mb-1">Track films</h3>
+                    <p class="text-sm text-gray-500 font-serif">Keep track of every film you've ever watched.</p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
+                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-gray-900 mb-1">Show some love</h3>
+                    <p class="text-sm text-gray-500 font-serif">Like your favorite films and lists.</p>
+                </div>
+            </div>
+
+            <div
+                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
+                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-gray-900 mb-1">Write reviews</h3>
+                    <p class="text-sm text-gray-500 font-serif">Share your thoughts on films with the community.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="flex justify-between items-end border-b border-gray-200 pb-3 mb-6">
+            <h2 class="text-xs font-bold tracking-widest uppercase text-gray-400">New released</h2>
+            <a routerLink="/films"
+                class="text-xs font-bold tracking-widest uppercase text-blue-500 hover:text-blue-700 transition-colors cursor-pointer">Browse
+                all &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div *ngFor="let movie of movies" [routerLink]="['/films', movie.id]"
+                class="bg-gray-200 aspect-[2/3] rounded-xl shadow-sm overflow-hidden relative cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:ring-2 hover:ring-figma-yellow transition-all duration-300 group">
+                <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w500' + movie.poster_path"
+                    [alt]="movie.title" class="w-full h-full object-cover">
+
+                <div
+                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                    <span class="text-white font-bold text-xs leading-tight drop-shadow-md">{{ movie.title }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

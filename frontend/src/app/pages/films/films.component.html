@@ -1,0 +1,78 @@
+<div class="flex flex-col md:flex-row gap-8">
+
+    <aside class="w-full md:w-1/4">
+        <div class="bg-figma-gray-light p-6 rounded-xl shadow-sm sticky top-8">
+            <h2 class="text-lg font-bold mb-4 border-b border-gray-200 pb-2">Filters & Sort</h2>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Sort By</label>
+                <select [(ngModel)]="selectedSort" (change)="onFilterChange()"
+                    class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-figma-yellow">
+                    <option *ngFor="let option of sortOptions" [value]="option.value">
+                        {{ option.label }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Genre</label>
+                <select [(ngModel)]="selectedGenre" (change)="onFilterChange()"
+                    class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-figma-yellow">
+                    <option value="">All Genres</option>
+                    <option *ngFor="let genre of genres" [value]="genre.id">
+                        {{ genre.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Release Year</label>
+                <input type="number" [(ngModel)]="selectedYear" (change)="onFilterChange()" placeholder="e.g. 2023"
+                    class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-figma-yellow">
+            </div>
+
+            <button (click)="selectedGenre=''; selectedYear=''; selectedSort='popularity.desc'; onFilterChange()"
+                class="w-full text-xs font-bold text-gray-500 hover:text-black uppercase tracking-wider">
+                Clear Filters
+            </button>
+        </div>
+    </aside>
+
+    <section class="w-full md:w-3/4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+
+            <div *ngFor="let movie of movies" [routerLink]="['/films', movie.id]"
+                class="bg-figma-gray-card aspect-[2/3] rounded-xl shadow-sm overflow-hidden relative cursor-pointer hover:scale-105 transition-transform duration-300 group">
+
+                <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w500' + movie.poster_path"
+                    [alt]="movie.title" class="w-full h-full object-cover">
+
+                <div *ngIf="!movie.poster_path"
+                    class="w-full h-full flex items-center justify-center bg-gray-300 p-4 text-center">
+                    <span class="text-sm font-bold text-gray-500">{{ movie.title }}</span>
+                </div>
+
+                <div
+                    class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4">
+                    <span class="text-white font-bold text-sm text-center mb-2">{{ movie.title }}</span>
+                    <span class="bg-figma-yellow text-black text-xs font-bold px-2 py-1 rounded">⭐ {{ movie.vote_average
+                        | number:'1.1-1' }}</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex justify-center items-center space-x-6 mt-12">
+            <button (click)="prevPage()" [disabled]="currentPage === 1"
+                class="text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-black disabled:opacity-30">
+                &larr; Previous
+            </button>
+            <span class="text-sm font-bold bg-gray-200 px-4 py-2 rounded-full">Page {{ currentPage }}</span>
+            <button (click)="nextPage()"
+                class="text-sm font-bold uppercase tracking-wider text-gray-500 hover:text-black">
+                Next &rarr;
+            </button>
+        </div>
+    </section>
+
+</div>

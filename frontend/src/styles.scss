@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: theme('colors.figma-bg');
+  color: theme('colors.figma-text');
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* Police basique et propre */
+}

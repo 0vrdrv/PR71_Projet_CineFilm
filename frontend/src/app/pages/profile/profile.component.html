@@ -1,0 +1,86 @@
+<div *ngIf="user" class="max-w-6xl mx-auto pt-8">
+
+    <div class="flex items-center gap-6 mb-12 border-b border-gray-200 pb-8">
+        <div
+            class="w-24 h-24 bg-figma-yellow rounded-full flex items-center justify-center text-3xl font-black text-black shadow-sm">
+            {{ user.username.charAt(0) | uppercase }}
+        </div>
+        <div>
+            <h1 class="text-3xl font-black text-gray-900">{{ user.username }}</h1>
+            <p class="text-sm text-gray-500 font-bold tracking-widest uppercase mt-1">Membre depuis 2026</p>
+        </div>
+    </div>
+
+    <div class="flex gap-8 mb-8 border-b border-gray-200">
+        <button (click)="setTab('watchlist')" [class.border-figma-yellow]="activeTab === 'watchlist'"
+            [class.text-gray-900]="activeTab === 'watchlist'" [class.border-transparent]="activeTab !== 'watchlist'"
+            [class.text-gray-400]="activeTab !== 'watchlist'"
+            class="pb-4 text-xs font-bold tracking-widest uppercase border-b-4 hover:text-gray-900 transition-colors">
+            Watchlist ({{ watchlist.length }})
+        </button>
+        <button (click)="setTab('diary')" [class.border-figma-yellow]="activeTab === 'diary'"
+            [class.text-gray-900]="activeTab === 'diary'" [class.border-transparent]="activeTab !== 'diary'"
+            [class.text-gray-400]="activeTab !== 'diary'"
+            class="pb-4 text-xs font-bold tracking-widest uppercase border-b-4 hover:text-gray-900 transition-colors">
+            Diary & Reviews ({{ diary.length }})
+        </button>
+    </div>
+
+    <div *ngIf="activeTab === 'watchlist'">
+        <div *ngIf="watchlist.length === 0"
+            class="text-center py-20 text-gray-400 text-sm font-bold uppercase tracking-widest">
+            Your watchlist is empty.
+        </div>
+
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+            <div *ngFor="let item of watchlist" [routerLink]="['/films', item.tmdb_id]"
+                class="bg-figma-gray-card aspect-[2/3] rounded-xl shadow-sm overflow-hidden relative cursor-pointer hover:scale-105 transition-transform border border-gray-100 group">
+                <img *ngIf="item.poster_path" [src]="'https://image.tmdb.org/t/p/w500' + item.poster_path"
+                    [alt]="item.movie_title" class="w-full h-full object-cover">
+                <div
+                    class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                    <span class="text-white text-xs font-bold">{{ item.movie_title }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="activeTab === 'diary'" class="space-y-4">
+        <div *ngIf="diary.length === 0"
+            class="text-center py-20 text-gray-400 text-sm font-bold uppercase tracking-widest">
+            You haven't logged any films yet.
+        </div>
+
+        <div *ngFor="let review of diary"
+            class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex gap-6 hover:shadow-md transition-shadow">
+            <div class="w-16 h-24 bg-figma-gray-card rounded shrink-0 cursor-pointer"
+                [routerLink]="['/films', review.tmdb_id]">
+                <img *ngIf="review.poster_path" [src]="'https://image.tmdb.org/t/p/w200' + review.poster_path"
+                    [alt]="review.movie_title" class="w-full h-full object-cover rounded">
+            </div>
+
+            <div class="flex-1">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-lg font-black text-gray-900 cursor-pointer hover:text-figma-yellow transition-colors"
+                        [routerLink]="['/films', review.tmdb_id]">
+                        {{ review.movie_title }}
+                    </h3>
+                    <span class="text-xs font-bold text-gray-400">{{ review.watch_date | date:'dd MMM yyyy' }}</span>
+                </div>
+
+                <div class="flex text-figma-yellow mb-3">
+                    <svg *ngFor="let s of [1,2,3,4,5]" class="w-4 h-4" [class.text-gray-200]="s > review.rating"
+                        fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                </div>
+
+                <p class="text-sm text-gray-600 font-serif leading-relaxed" *ngIf="review.comment">
+                    "{{ review.comment }}"
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>

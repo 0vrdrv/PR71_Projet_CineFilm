@@ -1,0 +1,163 @@
+<div *ngIf="movie" class="pb-20">
+
+    <div class="w-full h-[450px] bg-cover bg-center relative"
+        [style.background-image]="'url(https://image.tmdb.org/t/p/original' + movie.backdrop_path + ')'">
+        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-8 flex flex-col md:flex-row gap-12 relative z-10 -mt-40">
+
+        <div class="w-full md:w-1/4 shrink-0">
+            <img [src]="'https://image.tmdb.org/t/p/w500' + movie.poster_path" [alt]="movie.title"
+                class="w-full rounded-xl shadow-2xl border-4 border-white object-cover aspect-[2/3]">
+        </div>
+
+        <div class="w-full md:w-2/4 pt-6">
+            <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-2 tracking-tight">{{ movie.title }}</h1>
+            <p class="text-gray-500 text-sm mb-10 uppercase tracking-widest font-bold">
+                {{ movie.release_date | date:'yyyy' }} • {{ movie.runtime }} mins
+            </p>
+
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-10">
+                <h3 class="text-xs font-bold tracking-widest uppercase mb-4 text-gray-400">Synopsis</h3>
+                <p class="text-gray-700 text-lg leading-relaxed font-serif">{{ movie.overview }}</p>
+            </div>
+
+            <h3 class="text-xs font-bold tracking-widest uppercase mb-6 text-gray-400 border-b border-gray-200 pb-2">
+                Cast</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-8 gap-x-4 mb-16">
+                <div *ngFor="let actor of cast" class="flex flex-col">
+                    <span class="text-gray-900 font-bold text-sm mb-1">{{ actor.name }}</span>
+                    <span class="text-gray-500 text-xs">{{ actor.character }}</span>
+                </div>
+            </div>
+
+            <h3 class="text-xs font-bold tracking-widest uppercase mb-6 text-gray-400 border-b border-gray-200 pb-2">
+                Community Reviews</h3>
+
+            <div *ngIf="movieReviews.length === 0" class="text-gray-400 text-sm italic">
+                Aucun avis pour le moment. Soyez le premier !
+            </div>
+
+            <div class="space-y-6">
+                <div *ngFor="let review of movieReviews"
+                    class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative group">
+
+                    <div class="flex items-center gap-3 mb-3">
+                        <div
+                            class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500 text-xs">
+                            {{ review.username.charAt(0) | uppercase }}
+                        </div>
+                        <span class="font-bold text-gray-900 text-sm">{{ review.username }}</span>
+                        <div class="flex text-[#00e054] ml-2">
+                            <svg *ngFor="let s of [1,2,3,4,5]" class="w-4 h-4" [class.text-gray-200]="s > review.rating"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-700 font-serif leading-relaxed text-sm">{{ review.comment }}</p>
+
+                    <div *ngIf="currentUserId === review.user_id"
+                        class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <button (click)="editReview(review)"
+                            class="text-xs font-bold text-gray-400 hover:text-blue-500 uppercase tracking-widest">Edit</button>
+                        <button (click)="deleteReview(review.id)"
+                            class="text-xs font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="w-full md:w-1/4 pt-6">
+            <div class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 sticky top-8">
+
+                <div *ngIf="actionMessage"
+                    class="bg-green-50 text-green-700 border border-green-200 p-3 rounded-lg text-xs mb-6 font-bold text-center">
+                    {{ actionMessage }}
+                </div>
+
+                <ng-container *ngIf="isLoggedIn">
+                    <button (click)="addToWatchlist()"
+                        class="w-full bg-figma-gray-light text-gray-700 font-bold text-xs tracking-widest uppercase py-4 rounded-xl hover:bg-gray-200 transition-colors mb-4 border border-gray-200 shadow-sm">
+                        + Watchlist
+                    </button>
+
+                    <button (click)="showReviewForm = !showReviewForm; editingReviewId = null"
+                        class="w-full bg-figma-yellow text-black font-bold text-xs tracking-widest uppercase py-4 rounded-xl hover:scale-105 transition-transform shadow-md">
+                        Log or Review
+                    </button>
+
+                    <div *ngIf="showReviewForm" class="mt-6 border-t border-gray-100 pt-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <label
+                                class="block text-xs font-bold tracking-widest uppercase text-gray-500">Rating</label>
+                            <span class="text-xs font-bold text-gray-900">{{ reviewRating }} / 5</span>
+                        </div>
+
+                        <div class="relative inline-flex items-center mb-6" (mouseleave)="hoverValue = 0">
+                            <div class="flex text-gray-200">
+                                <svg *ngFor="let s of [1,2,3,4,5]" class="w-10 h-10" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                </svg>
+                            </div>
+                            <div class="absolute top-0 left-0 flex text-figma-yellow overflow-hidden pointer-events-none"
+                                [style.width.%]="((hoverValue || reviewRating) / 5) * 100">
+                                <svg *ngFor="let s of [1,2,3,4,5]" class="w-10 h-10 flex-shrink-0" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                </svg>
+                            </div>
+                            <div class="absolute top-0 left-0 w-full h-full flex">
+                                <div *ngFor="let val of ratingValues" class="flex-1 h-full cursor-pointer"
+                                    (mouseenter)="hoverValue = val" (click)="reviewRating = val"></div>
+                            </div>
+                        </div>
+
+                        <label
+                            class="block text-xs font-bold tracking-widest uppercase text-gray-500 mb-2">Review</label>
+                        <textarea [(ngModel)]="reviewComment" rows="4"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-gray-900 mb-4 outline-none focus:ring-2 focus:ring-figma-yellow"></textarea>
+
+                        <button (click)="submitReview()"
+                            class="w-full bg-black text-white font-bold text-xs tracking-widest uppercase py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                            {{ editingReviewId ? 'Update Review' : 'Save Review' }}
+                        </button>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="!isLoggedIn">
+                    <div class="text-center py-4">
+                        <div
+                            class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-200">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xs font-bold text-gray-900 mb-2 uppercase tracking-widest">Sign in to log</h3>
+                        <p class="text-xs text-gray-500 mb-6 font-serif leading-relaxed">Track your watched films and
+                            share your reviews with the community.</p>
+                        <a routerLink="/login"
+                            class="block w-full bg-figma-yellow text-black font-bold text-xs tracking-widest uppercase py-3 rounded-xl hover:scale-105 transition-transform shadow-md mb-3 cursor-pointer">
+                            Sign In
+                        </a>
+                        <a routerLink="/register"
+                            class="block w-full bg-white border border-gray-200 text-gray-700 font-bold text-xs tracking-widest uppercase py-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                            Create Account
+                        </a>
+                    </div>
+                </ng-container>
+
+            </div>
+        </div>
+
+    </div>
+</div>
