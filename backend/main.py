@@ -530,3 +530,40 @@ def get_my_feed(db: Session = Depends(get_db), current_user: models.User = Depen
             "watch_date": r.watch_date.isoformat() if r.watch_date else None,
         })
     return result
+@app.delete("/users/{followed_id}/follow")
+def unfollow_user(followed_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    follow = db.query(models.Follow).filter(
+        models.Follow.follower_id == current_user.id,
+        models.Follow.followed_id == followed_id
+    ).first()
+    if not follow:
+        raise HTTPException(status_code=404, detail="Tu ne suis pas cet utilisateur.")
+    db.delete(follow)
+    db.commit()
+    return {"message": "Unfollowed"}
+
+@app.get("/users/{user_id}/followers")
+def get_followers(user_id: int, db: Session = Depends(get_db)):
+    followers = db.query(models.Follow).filter(models.Follow.followed_id == user_id).all()
+    return [{"follower_id": f.follower_id} for f in followers]
+
+@app.get("/users/{user_id}/following")
+def get_following(user_id: int, db: Session = Depends(get_db)):
+    following = db.query(models.Follow).filter(models.Follow.follower_id == user_id).all()
+    return [{"followed_id": f.followed_id} for f in following]
+
+@app.get("/users/{user_id}/stats")
+def get_user_stats(user_id: int, db: Session = Depends(get_db)):
+    reviews_count = db.query(models.Review).filter(models.Review.user_id == user_id).count()
+    watchlist_count = db.query(models.Watchlist).filter(models.Watchlist.user_id == user_id).count()
+    lists_count = db.query(models.MovieList).filter(models.MovieList.user_id == user_id).count()
+    followers_count = db.query(models.Follow).filter(models.Follow.followed_id == user_id).count()
+    following_count = db.query(models.Follow).filter(models.Follow.follower_id == user_id).count()
+    return {
+        "reviews": reviews_count,
+        "watchlist": watchlist_count,
+        "lists": lists_count,
+        "followers": followers_count,
+        "following": following_count
+    }
+    

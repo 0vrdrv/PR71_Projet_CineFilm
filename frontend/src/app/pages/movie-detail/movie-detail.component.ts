@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-movie-detail',
   templateUrl: './movie-detail.component.html',
-  styleUrls: ['./movie-detail.component.scss']
+  styleUrls: ['./movie-detail.component.scss'],
 })
 export class MovieDetailComponent implements OnInit {
   movie: any;
@@ -15,7 +15,7 @@ export class MovieDetailComponent implements OnInit {
   isLoggedIn: boolean = false;
   currentUserId: number | null = null;
   actionMessage: string = '';
-  
+
   showReviewForm: boolean = false;
   reviewRating: number = 5;
   reviewComment: string = '';
@@ -26,24 +26,26 @@ export class MovieDetailComponent implements OnInit {
 
   movieReviews: any[] = [];
 
+  similarMovies: Movie[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private movieService: MovieService,
     private userActionService: UserActionService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+  ) {}
 
   ngOnInit(): void {
-    this.authService.isLoggedIn$.subscribe(status => {
+    this.authService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
       if (status) {
-        this.userActionService.getCurrentUser().subscribe(user => {
+        this.userActionService.getCurrentUser().subscribe((user) => {
           this.currentUserId = user.id;
         });
       }
     });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const movieId = params.get('id');
       if (movieId) {
         this.fetchMovieData(movieId);
@@ -53,22 +55,30 @@ export class MovieDetailComponent implements OnInit {
   }
 
   fetchMovieData(id: string) {
-    this.movieService.getMovieDetails(id).subscribe(data => this.movie = data);
-    this.movieService.getMovieCast(id).subscribe(data => this.cast = data.cast.slice(0, 6));
+    this.movieService
+      .getMovieDetails(id)
+      .subscribe((data) => (this.movie = data));
+    this.movieService
+      .getMovieCast(id)
+      .subscribe((data) => (this.cast = data.cast.slice(0, 6)));
+    this.movieService.getSimilarMovies(Number(id)).subscribe((data) => {
+      this.similarMovies = data.results.slice(0, 6);
+    });
   }
 
   loadReviews(tmdbId: number) {
-    this.userActionService.getMovieReviews(tmdbId).subscribe(reviews => {
+    this.userActionService.getMovieReviews(tmdbId).subscribe((reviews) => {
       this.movieReviews = reviews;
     });
   }
 
   addToWatchlist() {
     if (!this.isLoggedIn) return;
-    this.userActionService.addToWatchlist(this.movie.id, this.movie.title, this.movie.poster_path)
+    this.userActionService
+      .addToWatchlist(this.movie.id, this.movie.title, this.movie.poster_path)
       .subscribe({
-        next: () => this.actionMessage = "Film ajouté à votre Watchlist !",
-        error: () => this.actionMessage = "Erreur lors de l'ajout."
+        next: () => (this.actionMessage = 'Film ajouté à votre Watchlist !'),
+        error: () => (this.actionMessage = "Erreur lors de l'ajout."),
       });
   }
 
@@ -76,17 +86,28 @@ export class MovieDetailComponent implements OnInit {
     if (!this.isLoggedIn) return;
 
     if (this.editingReviewId) {
-      this.userActionService.updateReview(this.editingReviewId, this.reviewRating, this.reviewComment)
+      this.userActionService
+        .updateReview(
+          this.editingReviewId,
+          this.reviewRating,
+          this.reviewComment,
+        )
         .subscribe(() => {
-          this.actionMessage = "Avis mis à jour !";
+          this.actionMessage = 'Avis mis à jour !';
           this.showReviewForm = false;
           this.editingReviewId = null;
           this.loadReviews(this.movie.id);
         });
     } else {
-      this.userActionService.addReview(this.movie.id, this.movie.title, this.reviewRating, this.reviewComment)
+      this.userActionService
+        .addReview(
+          this.movie.id,
+          this.movie.title,
+          this.reviewRating,
+          this.reviewComment,
+        )
         .subscribe(() => {
-          this.actionMessage = "Avis publié !";
+          this.actionMessage = 'Avis publié !';
           this.showReviewForm = false;
           this.loadReviews(this.movie.id);
         });
@@ -102,9 +123,9 @@ export class MovieDetailComponent implements OnInit {
   }
 
   deleteReview(reviewId: number) {
-    if (confirm("Voulez-vous vraiment supprimer cet avis ?")) {
+    if (confirm('Voulez-vous vraiment supprimer cet avis ?')) {
       this.userActionService.deleteReview(reviewId).subscribe(() => {
-        this.actionMessage = "Avis supprimé.";
+        this.actionMessage = 'Avis supprimé.';
         this.loadReviews(this.movie.id);
       });
     }

@@ -2,10 +2,20 @@ export interface Review {
   id: number;
   tmdb_id: number;
   movie_title: string;
-  poster_path?: string;
   rating: number;
-  comment: string;
+  comment: string | null;
+  has_spoilers: boolean;
+  watch_date: string;
+  created_at: string;
   user_id: number;
-  username?: string; 
-  watch_date?: string;
+  username?: string;
+  poster_path?: string;
+}
+
+export interface ReviewCreate {
+  tmdb_id: number;
+  movie_title: string;
+  rating: number;
+  comment?: string;
+  has_spoilers?: boolean;
 }

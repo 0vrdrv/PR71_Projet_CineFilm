@@ -1,87 +1,52 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-// Assure-toi que le chemin d'import est correct selon ta structure
-import { TmdbResponse, Movie, Genre } from '../models/movie.model';
-
-// Interface spécifique pour la réponse du Casting (credits)
-export interface CastMember {
-  id: number;
-  name: string;
-  character: string;
-  profile_path: string | null;
-}
-
-export interface CreditsResponse {
-  id: number;
-  cast: CastMember[];
-}
+import { Movie, MovieResponse, CastResponse, Genre } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MovieService {
-  private apiKey = 'e976deb8e625fe67f0f2e1b47aa57944';
-  private baseUrl = 'https://api.themoviedb.org/3';
+  private apiUrl = 'http://127.0.0.1:8000/api/tmdb';
 
   constructor(private http: HttpClient) {}
 
-  // Retourne la structure paginée de TMDB
-  getNewReleases(): Observable<TmdbResponse> {
-    return this.http.get<TmdbResponse>(
-      `${this.baseUrl}/movie/now_playing?api_key=${this.apiKey}&language=fr-FR&page=1`,
-    );
+  getNewReleases(page: number = 1): Observable<MovieResponse> {
+    return this.http.get<MovieResponse>(`${this.apiUrl}/now_playing`, { params: { page } });
   }
 
-  getPopularMovies(): Observable<TmdbResponse> {
-    return this.http.get<TmdbResponse>(
-      `${this.baseUrl}/movie/popular?api_key=${this.apiKey}&language=fr-FR&page=1`,
-    );
+  getPopularMovies(page: number = 1): Observable<MovieResponse> {
+    return this.http.get<MovieResponse>(`${this.apiUrl}/popular`, { params: { page } });
   }
 
-  // Retourne un objet contenant un tableau de Genres
   getGenres(): Observable<{ genres: Genre[] }> {
-    return this.http.get<{ genres: Genre[] }>(
-      `${this.baseUrl}/genre/movie/list?api_key=${this.apiKey}&language=fr-FR`,
-    );
+    return this.http.get<{ genres: Genre[] }>(`${this.apiUrl}/genres`);
   }
 
-  // Recherche avec pagination
-  discoverMovies(
-    page: number = 1,
-    sortBy: string = 'popularity.desc',
-    genreId: string = '',
-    year: string = '',
-  ): Observable<TmdbResponse> {
-    let url = `${this.baseUrl}/discover/movie?api_key=${this.apiKey}&language=fr-FR&page=${page}&sort_by=${sortBy}`;
-
-    if (genreId) {
-      url += `&with_genres=${genreId}`;
-    }
-    if (year) {
-      url += `&primary_release_year=${year}`;
-    }
-
-    return this.http.get<TmdbResponse>(url);
+  discoverMovies(page: number = 1, sortBy: string = 'popularity.desc', genreId: string = '', year: string = ''): Observable<MovieResponse> {
+    const params: any = { page, sort_by: sortBy };
+    if (genreId) params.with_genres = genreId;
+    if (year) params.primary_release_year = year;
+    return this.http.get<MovieResponse>(`${this.apiUrl}/discover`, { params });
   }
 
-  searchMovies(query: string): Observable<TmdbResponse> {
-    return this.http.get<TmdbResponse>(
-      `${this.baseUrl}/search/movie?api_key=${this.apiKey}&language=fr-FR&query=${query}&page=1`,
-    );
-  }
-
-  // Retourne UN SEUL film précis
   getMovieDetails(movieId: string | number): Observable<Movie> {
-    return this.http.get<Movie>(
-      `${this.baseUrl}/movie/${movieId}?api_key=${this.apiKey}&language=fr-FR`,
-    );
+    return this.http.get<Movie>(`${this.apiUrl}/movie/${movieId}`);
   }
 
-  // Retourne la structure des crédits
-  getMovieCast(movieId: string | number): Observable<CreditsResponse> {
-    return this.http.get<CreditsResponse>(
-      `${this.baseUrl}/movie/${movieId}/credits?api_key=${this.apiKey}&language=fr-FR`,
-    );
+  getMovieCast(movieId: string | number): Observable<CastResponse> {
+    return this.http.get<CastResponse>(`${this.apiUrl}/movie/${movieId}/credits`);
+  }
+
+  searchMovies(query: string): Observable<MovieResponse> {
+    return this.http.get<MovieResponse>(`${this.apiUrl}/search`, { params: { query } });
+  }
+
+  getSimilarMovies(movieId: number): Observable<MovieResponse> {
+    return this.http.get<MovieResponse>(`${this.apiUrl}/movie/${movieId}/similar`);
+  }
+
+  getTrending(): Observable<MovieResponse> {
+    return this.http.get<MovieResponse>(`${this.apiUrl}/trending`);
   }
 }

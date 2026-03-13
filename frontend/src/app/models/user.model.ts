@@ -4,5 +4,15 @@ export interface User {
   email: string;
   bio?: string;
   avatar_url?: string;
-  is_active?: boolean;
+}
+
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
+}
+
+export interface UserCreate {
+  username: string;
+  email: string;
+  password: string;
 }

@@ -171,4 +171,24 @@ export class UserActionService {
       body,
     );
   }
+
+  followUser(userId: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/users/${userId}/follow`, {});
+}
+
+unfollowUser(userId: number): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/users/${userId}/follow`);
+}
+
+getUserStats(userId: number): Observable<any> {
+  return this.http.get(`${this.apiUrl}/users/${userId}/stats`);
+}
+
+getFollowers(userId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/users/${userId}/followers`);
+}
+
+getFollowing(userId: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/users/${userId}/following`);
+}
 }

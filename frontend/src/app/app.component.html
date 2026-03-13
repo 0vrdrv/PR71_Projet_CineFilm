@@ -1,4 +1,4 @@
-<header class="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white">
+<header class="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white relative">
 
   <div class="flex items-center gap-10">
     <a routerLink="/"
@@ -6,7 +6,8 @@
       Letterboxd
     </a>
 
-    <nav class="flex items-center space-x-6 text-xs font-bold tracking-widest uppercase pt-1">
+    <!-- Desktop nav -->
+    <nav class="hidden md:flex items-center space-x-6 text-xs font-bold tracking-widest uppercase pt-1">
       <ng-container *ngIf="!isLoggedIn">
         <a routerLink="/login"
           class="bg-figma-yellow px-4 py-2 rounded-md text-black cursor-pointer hover:scale-105 transition-transform shadow-sm">Sign
@@ -14,23 +15,22 @@
         <a routerLink="/register" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Create
           Account</a>
       </ng-container>
-
       <ng-container *ngIf="isLoggedIn">
         <a routerLink="/profile" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Profile</a>
+        <a routerLink="/feed" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Feed</a>
         <a (click)="logout()" class="hover:text-red-500 text-gray-500 cursor-pointer transition-colors">Log Out</a>
       </ng-container>
-
       <a routerLink="/films" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Films</a>
       <a routerLink="/lists" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Lists</a>
       <a routerLink="/members" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Members</a>
     </nav>
   </div>
 
-  <div class="relative">
+  <!-- Search (desktop) -->
+  <div class="hidden md:block relative">
     <input type="text" [formControl]="searchControl" (blur)="closeSearch()"
       (focus)="searchControl.value ? showDropdown = true : null" placeholder="Search..."
       class="bg-figma-gray-light rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-figma-yellow w-56 text-gray-700">
-
     <svg class="w-4 h-4 absolute right-4 top-2.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor"
       viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -41,22 +41,57 @@
       class="absolute top-full mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 right-0">
       <div *ngFor="let movie of searchResults" (click)="goToMovie(movie.id)"
         class="flex items-center gap-4 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors">
-
         <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w92' + movie.poster_path"
           class="w-10 h-14 object-cover rounded shadow-sm">
         <div *ngIf="!movie.poster_path" class="w-10 h-14 bg-gray-200 rounded flex-shrink-0"></div>
-
         <div class="flex-1 min-w-0">
           <h4 class="text-sm font-bold text-gray-900 truncate">{{ movie.title }}</h4>
           <span class="text-xs font-bold text-gray-400">{{ movie.release_date | date:'yyyy' }}</span>
         </div>
-
       </div>
     </div>
   </div>
 
+  <!-- Hamburger button -->
+  <button (click)="toggleMobileMenu()" class="md:hidden text-gray-700">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path *ngIf="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 6h16M4 12h16M4 18h16" />
+      <path *ngIf="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+
+  <!-- Mobile menu -->
+  <div *ngIf="mobileMenuOpen"
+    class="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 md:hidden">
+    <nav class="flex flex-col p-6 space-y-4 text-sm font-bold tracking-widest uppercase">
+      <a routerLink="/films" (click)="mobileMenuOpen=false" class="text-gray-700">Films</a>
+      <a routerLink="/lists" (click)="mobileMenuOpen=false" class="text-gray-700">Lists</a>
+      <a routerLink="/members" (click)="mobileMenuOpen=false" class="text-gray-700">Members</a>
+      <ng-container *ngIf="isLoggedIn">
+        <a routerLink="/profile" (click)="mobileMenuOpen=false" class="text-gray-700">Profile</a>
+        <a routerLink="/feed" (click)="mobileMenuOpen=false" class="text-gray-700">Feed</a>
+        <a (click)="logout(); mobileMenuOpen=false" class="text-red-500 cursor-pointer">Log Out</a>
+      </ng-container>
+      <ng-container *ngIf="!isLoggedIn">
+        <a routerLink="/login" (click)="mobileMenuOpen=false"
+          class="bg-figma-yellow px-4 py-2 rounded text-black text-center">Sign In</a>
+        <a routerLink="/register" (click)="mobileMenuOpen=false" class="text-gray-500">Create Account</a>
+      </ng-container>
+    </nav>
+  </div>
+
 </header>
+
+<app-toast></app-toast>
 
 <main class="max-w-6xl mx-auto p-8">
   <router-outlet></router-outlet>
 </main>
+
+<main class="max-w-6xl mx-auto p-8">
+  <router-outlet></router-outlet>
+</main>
+
+<app-toast></app-toast>

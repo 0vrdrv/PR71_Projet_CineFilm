@@ -8,39 +8,42 @@ import { MovieService } from './services/movie.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   isLoggedIn: boolean = false;
-  
+
   searchControl = new FormControl('');
   searchResults: any[] = [];
   showDropdown: boolean = false;
+  mobileMenuOpen = false;
 
   constructor(
     private authService: AuthService,
     private movieService: MovieService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
-    this.authService.isLoggedIn$.subscribe(status => {
+    this.authService.isLoggedIn$.subscribe((status) => {
       this.isLoggedIn = status;
     });
 
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => {
-        if (!query || query.length < 2) {
-          return of({ results: [] });
-        }
-        return this.movieService.searchMovies(query);
-      })
-    ).subscribe((data: any) => {
-      this.searchResults = data.results.slice(0, 5);
-      this.showDropdown = this.searchResults.length > 0;
-    });
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => {
+          if (!query || query.length < 2) {
+            return of({ results: [] });
+          }
+          return this.movieService.searchMovies(query);
+        }),
+      )
+      .subscribe((data: any) => {
+        this.searchResults = data.results.slice(0, 5);
+        this.showDropdown = this.searchResults.length > 0;
+      });
   }
 
   logout() {
@@ -54,6 +57,10 @@ export class AppComponent implements OnInit {
   }
 
   closeSearch() {
-    setTimeout(() => this.showDropdown = false, 200);
+    setTimeout(() => (this.showDropdown = false), 200);
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 }

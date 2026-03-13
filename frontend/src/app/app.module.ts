@@ -1,8 +1,9 @@
+// frontend/src/app/app.module.ts
+
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { SharedModule } from './shared/shared.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,8 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { MembersComponent } from './pages/members/members.component';
 import { ListsComponent } from './pages/lists/lists.component';
 import { ListDetailComponent } from './pages/list-detail/list-detail.component';
+import { ToastComponent } from '../app/shared/components/toast/toast.component';
+import { FeedComponent } from './pages/feed/feed.component';
 
 @NgModule({
   declarations: [
@@ -28,15 +31,16 @@ import { ListDetailComponent } from './pages/list-detail/list-detail.component';
     ProfileComponent,
     MembersComponent,
     ListsComponent,
-    ListDetailComponent
+    ListDetailComponent,
+    ToastComponent,
+    FeedComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule,
-    SharedModule
+    FormsModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
