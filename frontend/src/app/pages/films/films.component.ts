@@ -9,21 +9,22 @@ import { MovieService } from '../../services/movie.service';
 export class FilmsComponent implements OnInit {
   movies: any[] = [];
   genres: any[] = [];
-  
-  // Paramètres par défaut
+  loading: boolean = true;
+
   currentPage: number = 1;
+  totalResults: number = 0;
   selectedSort: string = 'popularity.desc';
   selectedGenre: string = '';
   selectedYear: string = '';
+  viewMode: 'grid' | 'list' = 'grid';
 
-  // Options de tri pour le menu déroulant
   sortOptions = [
-    { value: 'popularity.desc', label: 'Popularité (Décroissant)' },
-    { value: 'popularity.asc', label: 'Popularité (Croissant)' },
-    { value: 'vote_average.desc', label: 'Mieux notés' },
-    { value: 'primary_release_date.desc', label: 'Plus récents' },
-    { value: 'primary_release_date.asc', label: 'Plus anciens' },
-    { value: 'original_title.asc', label: 'Ordre alphabétique (A-Z)' }
+    { value: 'popularity.desc', label: 'Popularity (Desc)' },
+    { value: 'popularity.asc', label: 'Popularity (Asc)' },
+    { value: 'vote_average.desc', label: 'Highest Rated' },
+    { value: 'primary_release_date.desc', label: 'Newest' },
+    { value: 'primary_release_date.asc', label: 'Oldest' },
+    { value: 'original_title.asc', label: 'A-Z' }
   ];
 
   constructor(private movieService: MovieService) {}
@@ -40,19 +41,20 @@ export class FilmsComponent implements OnInit {
   }
 
   loadMovies() {
+    this.loading = true;
     this.movieService.discoverMovies(this.currentPage, this.selectedSort, this.selectedGenre, this.selectedYear)
       .subscribe((data: any) => {
         this.movies = data.results;
+        this.totalResults = data.total_results || 0;
+        this.loading = false;
       });
   }
 
-  // Appelée à chaque fois que l'utilisateur change un filtre
   onFilterChange() {
-    this.currentPage = 1; // On remet à la page 1 si on change de filtre
+    this.currentPage = 1;
     this.loadMovies();
   }
 
-  // Pagination basique
   nextPage() {
     this.currentPage++;
     this.loadMovies();

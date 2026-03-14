@@ -1,107 +1,182 @@
-<div class="pb-20">
+<div class="pb-20 -mx-6 -mt-8">
 
-    <div *ngIf="heroMovie" [routerLink]="['/films', heroMovie.id]"
-        class="relative w-full h-[70vh] min-h-[500px] rounded-3xl overflow-hidden mb-16 shadow-2xl cursor-pointer group">
-        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
-            [style.background-image]="'url(https://image.tmdb.org/t/p/original' + heroMovie.backdrop_path + ')'"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent"></div>
+    <!-- Hero Banner -->
+    <div *ngIf="heroMovies.length === 0" class="w-full h-[70vh] min-h-[480px] bg-surface-200 dark:bg-surface-800 animate-pulse rounded-b-3xl"></div>
 
-        <div class="absolute bottom-12 left-8 md:bottom-20 md:left-20 text-white max-w-3xl z-10">
-            <span
-                class="bg-figma-yellow text-black text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded mb-4 inline-block shadow-lg">Featured
-                Film</span>
-            <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight drop-shadow-md">{{
-                heroMovie.title }}</h1>
-            <p class="text-lg text-gray-300 line-clamp-3 font-serif leading-relaxed">{{ heroMovie.overview }}</p>
+    <div *ngIf="currentHero" [routerLink]="['/films', currentHero.id]"
+        class="relative w-full h-[70vh] min-h-[480px] overflow-hidden cursor-pointer group rounded-b-3xl">
+        <div *ngFor="let hero of heroMovies; let i = index"
+            class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
+            [class.opacity-100]="i === currentHeroIndex" [class.opacity-0]="i !== currentHeroIndex"
+            [style.background-image]="'url(https://image.tmdb.org/t/p/original' + hero.backdrop_path + ')'">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-surface-50 dark:from-surface-950 via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-surface-50/90 dark:from-surface-950/90 via-transparent to-transparent"></div>
+
+        <div class="absolute bottom-16 left-8 md:bottom-24 md:left-20 max-w-3xl z-10">
+            <span class="bg-brand-400 text-surface-900 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded mb-4 inline-block">Featured Film</span>
+            <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight text-surface-900 dark:text-white drop-shadow-md">{{ currentHero.title }}</h1>
+            <p class="text-lg text-surface-600 dark:text-surface-300 line-clamp-2 leading-relaxed mb-6">{{ currentHero.overview }}</p>
+            <span class="btn-primary inline-block">View Film</span>
+        </div>
+
+        <!-- Dots -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <button *ngFor="let hero of heroMovies; let i = index"
+                (click)="setHeroIndex(i); $event.preventDefault(); $event.stopPropagation()"
+                class="w-2 h-2 rounded-full transition-all"
+                [class.bg-brand-400]="i === currentHeroIndex" [class.w-6]="i === currentHeroIndex"
+                [class.bg-surface-300]="i !== currentHeroIndex" [class.dark:bg-surface-600]="i !== currentHeroIndex">
+            </button>
         </div>
     </div>
 
-    <div
-        class="bg-figma-yellow rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between mb-20 shadow-sm border border-yellow-200">
+    <div class="max-w-6xl mx-auto px-6">
+
+        <!-- CTA Banner -->
+        <div class="bg-brand-400 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between my-16 shadow-lg">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-black text-surface-900 mb-2 tracking-tight">Track films you've watched.</h2>
+                <p class="text-surface-700 text-lg">Save those you want to see. Tell your friends what's good.</p>
+            </div>
+            <a routerLink="/register"
+                class="mt-6 md:mt-0 bg-surface-900 text-white px-8 py-4 rounded-xl font-bold text-xs tracking-widest uppercase hover:scale-105 hover:shadow-xl transition-all cursor-pointer whitespace-nowrap">
+                Get started — It's free
+            </a>
+        </div>
+
+        <!-- Trending -->
+        <div *ngIf="trendingMovies.length > 0" class="mb-16">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-surface-400">Trending This Week</h2>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                <div *ngFor="let movie of trendingMovies" [routerLink]="['/films', movie.id]"
+                    class="poster-card aspect-[2/3] rounded-xl overflow-hidden relative cursor-pointer group shadow-poster poster-placeholder">
+                    <span class="z-0 absolute inset-0 flex items-center justify-center p-2 text-center">{{ movie.title }}</span>
+                    <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w342' + movie.poster_path"
+                        [alt]="movie.title" loading="lazy" (error)="movie.poster_path = ''"
+                        class="w-full h-full object-cover relative z-[1]">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 z-[2]">
+                        <span class="text-white font-bold text-xs leading-tight">{{ movie.title }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Reviews -->
+        <div *ngIf="popularReviews.length > 0" class="mb-16">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-surface-400">Recent Reviews</h2>
+                <a routerLink="/activity" class="text-sm font-bold tracking-widest uppercase text-brand-500 hover:text-brand-600 transition-colors cursor-pointer">See all &rarr;</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div *ngFor="let review of popularReviews"
+                    class="card p-5 border-l-4 transition-colors"
+                    [ngClass]="getRatingColor(review.rating)">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-7 h-7 bg-surface-100 dark:bg-surface-700 rounded-full flex items-center justify-center font-bold text-surface-400 text-[10px]">
+                            {{ review.username?.charAt(0) | uppercase }}
+                        </div>
+                        <span class="font-bold text-surface-900 dark:text-white text-xs">{{ review.username }}</span>
+                        <div class="flex ml-auto">
+                            <svg *ngFor="let s of [1,2,3,4,5]" class="w-3 h-3" [class.star-filled]="s <= review.rating"
+                                [class.star-empty]="s > review.rating"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <a [routerLink]="['/films', review.tmdb_id]" class="font-black text-surface-900 dark:text-white text-sm hover:text-brand-500 transition-colors cursor-pointer block mb-2">{{ review.movie_title }}</a>
+                    <p *ngIf="review.comment" class="text-xs text-surface-500 dark:text-surface-400 line-clamp-2 font-serif">{{ review.comment }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="mb-16">
+            <h2 class="text-sm font-bold tracking-widest uppercase mb-8 text-surface-400">Letterboxd lets you...</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card p-8">
+                    <div class="w-12 h-12 bg-brand-50 dark:bg-brand-500/10 rounded-full flex items-center justify-center shrink-0 mb-4">
+                        <svg class="w-5 h-5 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-surface-900 dark:text-white mb-1">Track films</h3>
+                    <p class="text-sm text-surface-500 dark:text-surface-400 font-serif">Keep track of every film you've ever watched.</p>
+                </div>
+                <div class="card p-8">
+                    <div class="w-12 h-12 bg-brand-50 dark:bg-brand-500/10 rounded-full flex items-center justify-center shrink-0 mb-4">
+                        <svg class="w-5 h-5 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-surface-900 dark:text-white mb-1">Show some love</h3>
+                    <p class="text-sm text-surface-500 dark:text-surface-400 font-serif">Like your favorite films and lists.</p>
+                </div>
+                <div class="card p-8">
+                    <div class="w-12 h-12 bg-brand-50 dark:bg-brand-500/10 rounded-full flex items-center justify-center shrink-0 mb-4">
+                        <svg class="w-5 h-5 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-bold text-surface-900 dark:text-white mb-1">Write reviews</h3>
+                    <p class="text-sm text-surface-500 dark:text-surface-400 font-serif">Share your thoughts on films with the community.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Lists -->
+        <div *ngIf="popularLists.length > 0" class="mb-16">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-surface-400">Popular Lists</h2>
+                <a routerLink="/lists" class="text-sm font-bold tracking-widest uppercase text-brand-500 hover:text-brand-600 transition-colors cursor-pointer">Browse all &rarr;</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a *ngFor="let list of popularLists" [routerLink]="['/lists', list.id]"
+                    class="card overflow-hidden hover:border-brand-400 cursor-pointer block">
+                    <div *ngIf="list.preview_posters?.length > 0" class="grid grid-cols-2 h-24">
+                        <div *ngFor="let poster of list.preview_posters.slice(0, 4)" class="overflow-hidden bg-surface-200 dark:bg-surface-700">
+                            <img [src]="'https://image.tmdb.org/t/p/w200' + poster" loading="lazy" (error)="$any($event.target).style.display='none'" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div *ngIf="!list.preview_posters?.length" class="h-24 bg-surface-100 dark:bg-surface-800 flex items-center justify-center">
+                        <span class="text-surface-400 text-[10px] font-bold uppercase tracking-widest">Empty</span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-black text-surface-900 dark:text-white text-sm mb-1">{{ list.title }}</h3>
+                        <p class="text-[10px] text-surface-400">by <span class="font-bold text-surface-500 dark:text-surface-300">{{ list.username }}</span> &bull; {{ list.item_count }} films</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- New Released -->
         <div>
-            <h2 class="text-3xl md:text-4xl font-black text-black mb-2 tracking-tight">Track films you've watched.</h2>
-            <p class="text-gray-800 text-lg font-serif">Save those you want to see. Tell your friends what's good.</p>
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-sm font-bold tracking-widest uppercase text-surface-400">New Released</h2>
+                <a routerLink="/films" class="text-sm font-bold tracking-widest uppercase text-brand-500 hover:text-brand-600 transition-colors cursor-pointer">Browse all &rarr;</a>
+            </div>
+            <div *ngIf="loading" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                <app-skeleton *ngFor="let i of [1,2,3,4,5,6,7,8]" type="card"></app-skeleton>
+            </div>
+            <div *ngIf="!loading" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                <div *ngFor="let movie of movies" [routerLink]="['/films', movie.id]"
+                    class="poster-card aspect-[2/3] rounded-xl overflow-hidden relative cursor-pointer group shadow-poster poster-placeholder">
+                    <span class="z-0 absolute inset-0 flex items-center justify-center p-2 text-center">{{ movie.title }}</span>
+                    <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w342' + movie.poster_path"
+                        [alt]="movie.title" loading="lazy" (error)="movie.poster_path = ''"
+                        class="w-full h-full object-cover relative z-[1]">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 z-[2]">
+                        <span class="text-white font-bold text-xs leading-tight">{{ movie.title }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <a routerLink="/register"
-            class="mt-6 md:mt-0 bg-black text-white px-8 py-4 rounded-xl font-bold text-xs tracking-widest uppercase hover:scale-105 hover:shadow-xl transition-all cursor-pointer whitespace-nowrap">
-            Get started - It's free
-        </a>
+
     </div>
-
-    <div class="mb-24">
-        <h2 class="text-xs font-bold tracking-widest uppercase mb-8 text-gray-400 border-b border-gray-200 pb-3">
-            Letterboxd lets you...</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
-                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
-                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
-                        <path fill-rule="evenodd"
-                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-base font-black text-gray-900 mb-1">Track films</h3>
-                    <p class="text-sm text-gray-500 font-serif">Keep track of every film you've ever watched.</p>
-                </div>
-            </div>
-
-            <div
-                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
-                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-base font-black text-gray-900 mb-1">Show some love</h3>
-                    <p class="text-sm text-gray-500 font-serif">Like your favorite films and lists.</p>
-                </div>
-            </div>
-
-            <div
-                class="bg-white border border-gray-100 p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
-                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-base font-black text-gray-900 mb-1">Write reviews</h3>
-                    <p class="text-sm text-gray-500 font-serif">Share your thoughts on films with the community.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div>
-        <div class="flex justify-between items-end border-b border-gray-200 pb-3 mb-6">
-            <h2 class="text-xs font-bold tracking-widest uppercase text-gray-400">New released</h2>
-            <a routerLink="/films"
-                class="text-xs font-bold tracking-widest uppercase text-blue-500 hover:text-blue-700 transition-colors cursor-pointer">Browse
-                all &rarr;</a>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 gap-4">
-            <div *ngFor="let movie of movies" [routerLink]="['/films', movie.id]"
-                class="bg-gray-200 aspect-[2/3] rounded-xl shadow-sm overflow-hidden relative cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:ring-2 hover:ring-figma-yellow transition-all duration-300 group">
-                <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w500' + movie.poster_path"
-                    [alt]="movie.title" class="w-full h-full object-cover">
-
-                <div
-                    class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                    <span class="text-white font-bold text-xs leading-tight drop-shadow-md">{{ movie.title }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>

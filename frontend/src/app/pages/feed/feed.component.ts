@@ -13,6 +13,7 @@ export class FeedComponent implements OnInit {
   feedReviews: (Review & { poster_path?: string })[] = [];
   isLoggedIn = false;
   loading = true;
+  currentPage = 1;
 
   constructor(
     private http: HttpClient,
@@ -24,21 +25,37 @@ export class FeedComponent implements OnInit {
     this.authService.isLoggedIn$.subscribe(status => {
       this.isLoggedIn = status;
       if (status) {
-        this.http.get<Review[]>('http://127.0.0.1:8000/feed').subscribe({
-          next: reviews => {
-            this.feedReviews = reviews;
-            this.feedReviews.forEach(r => {
-              this.movieService.getMovieDetails(r.tmdb_id).subscribe(movie => {
-                r.poster_path = movie.poster_path ?? undefined;
-              });
-            });
-            this.loading = false;
-          },
-          error: () => this.loading = false
-        });
+        this.loadFeed(1);
       } else {
         this.loading = false;
       }
     });
+  }
+
+  loadFeed(page: number) {
+    this.loading = true;
+    this.http.get<any>(`http://127.0.0.1:8000/feed?page=${page}&limit=20`).subscribe({
+      next: data => {
+        const reviews = data.reviews || data;
+        const newReviews = Array.isArray(reviews) ? reviews : [];
+        newReviews.forEach((r: any) => {
+          this.movieService.getMovieDetails(r.tmdb_id).subscribe(movie => {
+            r.poster_path = movie.poster_path ?? undefined;
+          });
+        });
+        if (page === 1) {
+          this.feedReviews = newReviews;
+        } else {
+          this.feedReviews = [...this.feedReviews, ...newReviews];
+        }
+        this.loading = false;
+      },
+      error: () => this.loading = false
+    });
+  }
+
+  loadMore() {
+    this.currentPage++;
+    this.loadFeed(this.currentPage);
   }
 }

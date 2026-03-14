@@ -1,0 +1,59 @@
+<div class="pb-20">
+  <div class="mb-8">
+    <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="search(searchQuery)"
+      placeholder="Search for films or members..."
+      class="input-base w-full text-lg !py-4">
+  </div>
+
+  <div class="flex gap-8 mb-8 border-b border-surface-200 dark:border-surface-700">
+    <button (click)="activeTab = 'films'"
+      class="pb-4 text-xs font-bold tracking-widest uppercase border-b-2 hover:text-surface-900 dark:hover:text-white transition-colors"
+      [class.border-brand-400]="activeTab === 'films'" [class.text-surface-900]="activeTab === 'films'" [class.dark:text-white]="activeTab === 'films'"
+      [class.border-transparent]="activeTab !== 'films'" [class.text-surface-400]="activeTab !== 'films'">
+      Films ({{ filmResults.length }})
+    </button>
+    <button (click)="activeTab = 'members'"
+      class="pb-4 text-xs font-bold tracking-widest uppercase border-b-2 hover:text-surface-900 dark:hover:text-white transition-colors"
+      [class.border-brand-400]="activeTab === 'members'" [class.text-surface-900]="activeTab === 'members'" [class.dark:text-white]="activeTab === 'members'"
+      [class.border-transparent]="activeTab !== 'members'" [class.text-surface-400]="activeTab !== 'members'">
+      Members ({{ memberResults.length }})
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+    <app-skeleton *ngFor="let i of [1,2,3,4,5,6]" type="card"></app-skeleton>
+  </div>
+
+  <div *ngIf="!loading && activeTab === 'films'">
+    <div *ngIf="filmResults.length === 0 && searchQuery" class="text-center py-20 text-surface-400 text-sm font-bold uppercase tracking-widest">
+      No results found
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+      <div *ngFor="let movie of filmResults" [routerLink]="['/films', movie.id]"
+        class="poster-card aspect-[2/3] rounded-xl overflow-hidden relative cursor-pointer group shadow-poster poster-placeholder">
+        <span class="z-0 absolute inset-0 flex items-center justify-center p-2 text-center">{{ movie.title }}</span>
+        <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w342' + movie.poster_path"
+          [alt]="movie.title" loading="lazy" (error)="movie.poster_path = ''"
+          class="w-full h-full object-cover relative z-[1]">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 z-[2]">
+          <span class="text-white font-bold text-xs leading-tight">{{ movie.title }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && activeTab === 'members'">
+    <div *ngIf="memberResults.length === 0 && searchQuery" class="text-center py-20 text-surface-400 text-sm font-bold uppercase tracking-widest">
+      No results found
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div *ngFor="let user of memberResults" [routerLink]="['/profile', user.id]"
+        class="card p-6 flex flex-col items-center cursor-pointer hover:border-brand-400 group">
+        <div class="w-16 h-16 bg-surface-100 dark:bg-surface-800 rounded-full flex items-center justify-center text-xl font-black text-surface-400 group-hover:bg-brand-400 group-hover:text-surface-900 transition-colors mb-4">
+          {{ user.username.charAt(0) | uppercase }}
+        </div>
+        <h3 class="text-sm font-bold text-surface-900 dark:text-white truncate w-full text-center">{{ user.username }}</h3>
+      </div>
+    </div>
+  </div>
+</div>

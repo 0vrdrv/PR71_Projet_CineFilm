@@ -4,10 +4,10 @@ import { Component, Input } from '@angular/core';
   selector: 'app-skeleton',
   template: `
     <div class="animate-pulse">
-      <div *ngIf="type === 'card'" class="bg-gray-200 aspect-[2/3] rounded-xl"></div>
-      <div *ngIf="type === 'text'" class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-      <div *ngIf="type === 'title'" class="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-      <div *ngIf="type === 'avatar'" class="w-16 h-16 bg-gray-200 rounded-full"></div>
+      <div *ngIf="type === 'card'" class="bg-surface-200 dark:bg-surface-800 aspect-[2/3] rounded-xl"></div>
+      <div *ngIf="type === 'text'" class="h-4 bg-surface-200 dark:bg-surface-800 rounded w-3/4 mb-2"></div>
+      <div *ngIf="type === 'title'" class="h-8 bg-surface-200 dark:bg-surface-800 rounded w-1/2 mb-4"></div>
+      <div *ngIf="type === 'avatar'" class="w-16 h-16 bg-surface-200 dark:bg-surface-800 rounded-full"></div>
     </div>
   `,
   styles: [`

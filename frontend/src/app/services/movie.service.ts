@@ -49,4 +49,8 @@ export class MovieService {
   getTrending(): Observable<MovieResponse> {
     return this.http.get<MovieResponse>(`${this.apiUrl}/trending`);
   }
+
+  getWatchProviders(movieId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/movie/${movieId}/providers`);
+  }
 }

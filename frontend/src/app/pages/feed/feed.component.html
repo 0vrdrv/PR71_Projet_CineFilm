@@ -1,34 +1,52 @@
-<div class="max-w-4xl mx-auto pt-8 pb-20">
-  <h1 class="text-3xl font-black text-gray-900 mb-2">Activity Feed</h1>
-  <p class="text-gray-500 text-sm font-bold tracking-widest uppercase mb-12 border-b border-gray-200 pb-4">
+<div class="max-w-4xl mx-auto pb-20">
+  <h1 class="text-3xl font-black text-surface-900 dark:text-white mb-2">Activity Feed</h1>
+  <p class="text-surface-400 text-sm font-bold tracking-widest uppercase mb-10 border-b border-surface-200 dark:border-surface-700 pb-4">
     Recent activity from people you follow
   </p>
 
-  <div *ngIf="!isLoggedIn" class="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200">
-    <p class="text-gray-500 font-serif mb-4">Sign in to see activity from people you follow.</p>
-    <a routerLink="/login" class="inline-block bg-black text-white font-bold text-xs tracking-widest uppercase px-6 py-3 rounded-xl">Sign In</a>
+  <div *ngIf="!isLoggedIn" class="text-center py-20 card">
+    <p class="text-surface-500 dark:text-surface-400 mb-4">Sign in to see activity from people you follow.</p>
+    <a routerLink="/login" class="btn-primary inline-block">Sign In</a>
   </div>
 
-  <div *ngIf="isLoggedIn && !loading && feedReviews.length === 0" class="text-center py-20 text-gray-400 text-sm font-bold uppercase tracking-widest">
+  <div *ngIf="isLoggedIn && !loading && feedReviews.length === 0" class="text-center py-20 text-surface-400 text-sm font-bold uppercase tracking-widest">
     No activity yet. Start following members!
   </div>
 
-  <div class="space-y-6">
-    <div *ngFor="let review of feedReviews" class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex gap-6 hover:shadow-md transition-shadow">
-      <div class="w-16 h-24 bg-gray-200 rounded shrink-0 cursor-pointer overflow-hidden" [routerLink]="['/films', review.tmdb_id]">
-        <img *ngIf="review.poster_path" [src]="'https://image.tmdb.org/t/p/w200' + review.poster_path" class="w-full h-full object-cover">
+  <div class="space-y-4">
+    <div *ngFor="let review of feedReviews" class="card p-6 flex gap-5">
+      <div class="flex flex-col items-center gap-2 shrink-0">
+        <a [routerLink]="['/profile', review.user_id]"
+          class="w-10 h-10 bg-surface-100 dark:bg-surface-800 rounded-full flex items-center justify-center text-sm font-black text-surface-400 cursor-pointer hover:bg-brand-400 hover:text-surface-900 transition-colors">
+          {{ review.username?.charAt(0) | uppercase }}
+        </a>
+      </div>
+      <div class="w-16 h-24 rounded-lg shrink-0 cursor-pointer overflow-hidden poster-card poster-placeholder relative" [routerLink]="['/films', review.tmdb_id]">
+        <span class="z-0 absolute inset-0 flex items-center justify-center p-1 text-center text-[8px]">{{ review.movie_title }}</span>
+        <img *ngIf="review.poster_path" [src]="'https://image.tmdb.org/t/p/w200' + review.poster_path"
+          loading="lazy" (error)="review.poster_path = ''"
+          class="w-full h-full object-cover relative z-[1]">
       </div>
       <div class="flex-1">
-        <h3 class="text-lg font-black text-gray-900 cursor-pointer hover:text-figma-yellow transition-colors" [routerLink]="['/films', review.tmdb_id]">
-          {{ review.movie_title }}
-        </h3>
-        <div class="flex text-figma-yellow my-2">
-          <svg *ngFor="let s of [1,2,3,4,5]" class="w-4 h-4" [class.text-gray-200]="s > review.rating" fill="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2 mb-1">
+          <a [routerLink]="['/profile', review.user_id]" class="text-sm font-bold text-surface-900 dark:text-white hover:text-brand-500 transition-colors cursor-pointer">{{ review.username }}</a>
+          <span class="text-xs text-surface-400">{{ review.watch_date | date:'dd MMM yyyy' }}</span>
+        </div>
+        <h3 class="text-lg font-black text-surface-900 dark:text-white cursor-pointer hover:text-brand-500 transition-colors" [routerLink]="['/films', review.tmdb_id]">{{ review.movie_title }}</h3>
+        <div class="flex my-2">
+          <svg *ngFor="let s of [1,2,3,4,5]" class="w-4 h-4" [class.star-filled]="s <= review.rating"
+            [class.star-empty]="s > review.rating" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
           </svg>
         </div>
-        <p *ngIf="review.comment" class="text-sm text-gray-600 font-serif leading-relaxed">"{{ review.comment }}"</p>
+        <p *ngIf="review.comment" class="text-sm text-surface-600 dark:text-surface-400 leading-relaxed font-serif">"{{ review.comment }}"</p>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="feedReviews.length > 0" class="text-center mt-10">
+    <button (click)="loadMore()" class="btn-secondary">
+      Load more
+    </button>
   </div>
 </div>

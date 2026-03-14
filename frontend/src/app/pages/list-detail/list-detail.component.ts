@@ -4,6 +4,7 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { UserActionService } from '../../services/user-action.service';
 import { MovieService } from '../../services/movie.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-list-detail',
@@ -14,7 +15,7 @@ export class ListDetailComponent implements OnInit {
   listId!: number;
   listDetails: any = null;
   listItems: any[] = [];
-  
+
   searchControl = new FormControl('');
   searchResults: any[] = [];
   showDropdown: boolean = false;
@@ -22,7 +23,8 @@ export class ListDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private userActionService: UserActionService,
-    private movieService: MovieService
+    private movieService: MovieService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -35,7 +37,6 @@ export class ListDetailComponent implements OnInit {
       }
     });
 
-    // Moteur de recherche instantané TMDb
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -57,12 +58,19 @@ export class ListDetailComponent implements OnInit {
     this.userActionService.getListItems(this.listId).subscribe(data => this.listItems = data);
   }
 
-  // Ajoute le film directement à la liste en cliquant sur le résultat
   addMovie(movie: any) {
     this.userActionService.addMovieToList(this.listId, movie.id, movie.title, movie.poster_path).subscribe(() => {
+      this.notificationService.success("Film ajouté à la liste !");
       this.searchControl.setValue('', { emitEvent: false });
       this.showDropdown = false;
-      this.fetchListItems(); // Recharge la grille de la liste
+      this.fetchListItems();
+    });
+  }
+
+  removeMovie(tmdbId: number) {
+    this.userActionService.removeMovieFromList(this.listId, tmdbId).subscribe(() => {
+      this.notificationService.info("Film retiré de la liste");
+      this.fetchListItems();
     });
   }
 

@@ -1,55 +1,53 @@
-<div class="max-w-6xl mx-auto pt-8 pb-20" *ngIf="listDetails">
-  
-  <div class="mb-12 border-b border-gray-200 pb-8">
-    <span class="bg-gray-100 text-gray-500 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded mb-4 inline-block">My List</span>
-    <h1 class="text-4xl font-black text-gray-900 mb-2">{{ listDetails.title }}</h1>
-    <p class="text-gray-500 font-serif text-lg">{{ listDetails.description }}</p>
+<div class="pb-20" *ngIf="listDetails">
+
+  <div class="mb-10 border-b border-surface-200 dark:border-surface-700 pb-8">
+    <span class="bg-surface-100 dark:bg-surface-800 text-surface-500 dark:text-surface-400 text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded mb-4 inline-block border border-surface-200 dark:border-surface-700">List</span>
+    <h1 class="text-4xl font-black text-surface-900 dark:text-white mb-2">{{ listDetails.title }}</h1>
+    <p class="text-surface-500 dark:text-surface-400 text-lg font-serif">{{ listDetails.description }}</p>
   </div>
 
-  <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-12 relative">
-    <h3 class="text-xs font-bold tracking-widest uppercase text-gray-500 mb-4">Add a film to this list</h3>
-    
+  <div class="card p-6 mb-10 relative">
+    <h3 class="text-xs font-bold tracking-widest uppercase text-surface-400 mb-4">Add a film to this list</h3>
     <div class="relative">
-      <input 
-        type="text" 
-        [formControl]="searchControl"
-        (blur)="closeSearch()"
+      <input type="text" [formControl]="searchControl" (blur)="closeSearch()"
         (focus)="searchControl.value ? showDropdown = true : null"
-        placeholder="Type a film name to add..." 
-        class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:ring-2 focus:ring-figma-yellow shadow-inner">
-      
-      <div *ngIf="showDropdown" class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 left-0">
-        <div 
-          *ngFor="let movie of searchResults" 
-          (click)="addMovie(movie)"
-          class="flex items-center gap-4 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors group">
-          
-          <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w92' + movie.poster_path" class="w-10 h-14 object-cover rounded shadow-sm">
-          <div *ngIf="!movie.poster_path" class="w-10 h-14 bg-gray-200 rounded flex-shrink-0"></div>
-          
+        placeholder="Type a film name to add..."
+        class="input-base w-full">
+      <div *ngIf="showDropdown" class="absolute top-full mt-2 w-full card overflow-hidden z-50 left-0 !shadow-xl">
+        <div *ngFor="let movie of searchResults" (click)="addMovie(movie)"
+          class="flex items-center gap-3 p-3 hover:bg-surface-50 dark:hover:bg-surface-700 cursor-pointer border-b border-surface-100 dark:border-surface-700 last:border-0 transition-colors group">
+          <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w92' + movie.poster_path"
+            loading="lazy" (error)="movie.poster_path = ''"
+            class="w-10 h-14 object-cover rounded shadow-sm">
+          <div *ngIf="!movie.poster_path" class="w-10 h-14 bg-surface-200 dark:bg-surface-700 rounded flex-shrink-0"></div>
           <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-bold text-gray-900 truncate">{{ movie.title }}</h4>
-            <span class="text-xs font-bold text-gray-400">{{ movie.release_date | date:'yyyy' }}</span>
+            <h4 class="text-sm font-bold text-surface-900 dark:text-white truncate">{{ movie.title }}</h4>
+            <span class="text-xs text-surface-400">{{ movie.release_date | date:'yyyy' }}</span>
           </div>
-
-          <button class="bg-gray-100 text-gray-600 group-hover:bg-figma-yellow group-hover:text-black font-bold text-[10px] uppercase tracking-widest px-3 py-2 rounded transition-colors">
-            + Add
-          </button>
+          <button class="bg-surface-100 dark:bg-surface-700 text-surface-500 group-hover:bg-brand-400 group-hover:text-surface-900 font-bold text-[10px] uppercase tracking-widest px-3 py-2 rounded-lg transition-colors">+ Add</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="listItems.length === 0" class="text-center py-20 text-gray-400 text-sm font-bold uppercase tracking-widest">
+  <div *ngIf="listItems.length === 0" class="text-center py-20 text-surface-400 text-sm font-bold uppercase tracking-widest">
     This list is currently empty.
   </div>
 
   <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-    <div *ngFor="let item of listItems" [routerLink]="['/films', item.tmdb_id]" class="bg-figma-gray-card aspect-[2/3] rounded-xl shadow-sm overflow-hidden relative cursor-pointer hover:scale-105 transition-transform border border-gray-100 group">
-      <img *ngIf="item.poster_path" [src]="'https://image.tmdb.org/t/p/w500' + item.poster_path" [alt]="item.movie_title" class="w-full h-full object-cover">
-      <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
-         <span class="text-white text-xs font-bold">{{ item.movie_title }}</span>
+    <div *ngFor="let item of listItems" [routerLink]="['/films', item.tmdb_id]"
+      class="poster-card aspect-[2/3] rounded-xl overflow-hidden relative cursor-pointer group shadow-poster poster-placeholder">
+      <span class="z-0 absolute inset-0 flex items-center justify-center p-2 text-center">{{ item.movie_title }}</span>
+      <img *ngIf="item.poster_path" [src]="'https://image.tmdb.org/t/p/w342' + item.poster_path" [alt]="item.movie_title"
+        loading="lazy" (error)="item.poster_path = ''"
+        class="w-full h-full object-cover relative z-[1]">
+      <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center z-[2]">
+        <span class="text-white text-xs font-bold">{{ item.movie_title }}</span>
       </div>
+      <button (click)="removeMovie(item.tmdb_id); $event.stopPropagation()"
+        class="absolute top-2 right-2 w-7 h-7 bg-accent-red/80 hover:bg-accent-red text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold z-10">
+        &times;
+      </button>
     </div>
   </div>
 

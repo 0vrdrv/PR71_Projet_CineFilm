@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${this.apiUrl}/auth/register`, userData);
   }
 
   login(credentials: any): Observable<any> {
@@ -35,7 +35,7 @@ export class AuthService {
     });
 
     return this.http
-      .post(`${this.apiUrl}/login`, body.toString(), { headers })
+      .post(`${this.apiUrl}/auth/login`, body.toString(), { headers })
       .pipe(
         tap((res: any) => {
           if (res.access_token) {

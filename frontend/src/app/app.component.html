@@ -1,97 +1,130 @@
-<header class="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white relative">
-
-  <div class="flex items-center gap-10">
-    <a routerLink="/"
-      class="text-2xl font-black tracking-tighter text-gray-900 cursor-pointer hover:text-figma-yellow transition-colors">
-      Letterboxd
-    </a>
-
-    <!-- Desktop nav -->
-    <nav class="hidden md:flex items-center space-x-6 text-xs font-bold tracking-widest uppercase pt-1">
-      <ng-container *ngIf="!isLoggedIn">
-        <a routerLink="/login"
-          class="bg-figma-yellow px-4 py-2 rounded-md text-black cursor-pointer hover:scale-105 transition-transform shadow-sm">Sign
-          In</a>
-        <a routerLink="/register" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Create
-          Account</a>
-      </ng-container>
-      <ng-container *ngIf="isLoggedIn">
-        <a routerLink="/profile" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Profile</a>
-        <a routerLink="/feed" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Feed</a>
-        <a (click)="logout()" class="hover:text-red-500 text-gray-500 cursor-pointer transition-colors">Log Out</a>
-      </ng-container>
-      <a routerLink="/films" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Films</a>
-      <a routerLink="/lists" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Lists</a>
-      <a routerLink="/members" class="hover:text-gray-900 text-gray-500 cursor-pointer transition-colors">Members</a>
-    </nav>
-  </div>
-
-  <!-- Search (desktop) -->
-  <div class="hidden md:block relative">
-    <input type="text" [formControl]="searchControl" (blur)="closeSearch()"
-      (focus)="searchControl.value ? showDropdown = true : null" placeholder="Search..."
-      class="bg-figma-gray-light rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-figma-yellow w-56 text-gray-700">
-    <svg class="w-4 h-4 absolute right-4 top-2.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor"
-      viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-    </svg>
-
-    <div *ngIf="showDropdown"
-      class="absolute top-full mt-3 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 right-0">
-      <div *ngFor="let movie of searchResults" (click)="goToMovie(movie.id)"
-        class="flex items-center gap-4 p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors">
-        <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w92' + movie.poster_path"
-          class="w-10 h-14 object-cover rounded shadow-sm">
-        <div *ngIf="!movie.poster_path" class="w-10 h-14 bg-gray-200 rounded flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <h4 class="text-sm font-bold text-gray-900 truncate">{{ movie.title }}</h4>
-          <span class="text-xs font-bold text-gray-400">{{ movie.release_date | date:'yyyy' }}</span>
+<header class="sticky top-0 z-50 backdrop-blur-lg transition-all duration-300"
+  [class]="scrolled ? 'bg-white/90 dark:bg-surface-900/90 shadow-md py-3' : 'bg-white dark:bg-surface-900 border-b border-surface-100 dark:border-surface-800 py-5'">
+  <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+    <div class="flex items-center gap-8">
+      <a routerLink="/" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 bg-brand-400 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+          <svg class="w-4 h-4 text-surface-900" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+          </svg>
+        </div>
+        <span class="text-lg font-bold text-surface-900 dark:text-white tracking-tight">Letterboxd</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-1 text-[13px] font-semibold">
+        <a routerLink="/films" routerLinkActive="text-surface-900 dark:text-white bg-surface-100 dark:bg-surface-800"
+          class="text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white px-3.5 py-2 rounded-lg transition-colors">Films</a>
+        <a routerLink="/activity" routerLinkActive="text-surface-900 dark:text-white bg-surface-100 dark:bg-surface-800"
+          class="text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white px-3.5 py-2 rounded-lg transition-colors">Activity</a>
+        <a routerLink="/lists" routerLinkActive="text-surface-900 dark:text-white bg-surface-100 dark:bg-surface-800"
+          class="text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white px-3.5 py-2 rounded-lg transition-colors">Lists</a>
+        <a routerLink="/members" routerLinkActive="text-surface-900 dark:text-white bg-surface-100 dark:bg-surface-800"
+          class="text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white px-3.5 py-2 rounded-lg transition-colors">Members</a>
+        <a *ngIf="isLoggedIn" routerLink="/feed" routerLinkActive="text-surface-900 dark:text-white bg-surface-100 dark:bg-surface-800"
+          class="text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white px-3.5 py-2 rounded-lg transition-colors">Feed</a>
+      </nav>
+    </div>
+    <div class="hidden md:flex items-center gap-3">
+      <div class="relative">
+        <input type="text" [formControl]="searchControl" (blur)="closeSearch()"
+          (focus)="searchControl.value ? showDropdown = true : null"
+          (keyup.enter)="onSearchEnter()"
+          placeholder="Search films..."
+          class="input-base w-48 focus:w-60 !py-2 !rounded-full !pl-9 text-sm transition-all">
+        <svg class="w-4 h-4 absolute left-3 top-2.5 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <div *ngIf="showDropdown" class="absolute top-full mt-2 w-80 card overflow-hidden z-50 right-0 !rounded-xl !shadow-xl">
+          <div *ngFor="let movie of searchResults" (mousedown)="goToMovie(movie.id)"
+            class="flex items-center gap-3 p-3 hover:bg-surface-50 dark:hover:bg-surface-700 cursor-pointer border-b border-surface-100 dark:border-surface-700 last:border-0 transition-colors">
+            <img *ngIf="movie.poster_path" [src]="'https://image.tmdb.org/t/p/w92' + movie.poster_path"
+              loading="lazy" (error)="movie.poster_path = ''"
+              class="w-9 h-14 object-cover rounded shadow-sm">
+            <div *ngIf="!movie.poster_path" class="w-9 h-14 bg-surface-200 dark:bg-surface-700 rounded flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-bold text-surface-900 dark:text-white truncate">{{ movie.title }}</h4>
+              <span class="text-xs text-surface-400">{{ movie.release_date | date:'yyyy' }}</span>
+            </div>
+          </div>
         </div>
       </div>
+      <button (click)="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-surface-100 dark:hover:bg-surface-800 transition-all">
+        <svg *ngIf="!isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+        <svg *ngIf="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+      </button>
+      <ng-container *ngIf="!isLoggedIn">
+        <a routerLink="/login" class="btn-ghost">Sign In</a>
+        <a routerLink="/register" class="btn-primary !rounded-full">Join</a>
+      </ng-container>
+      <ng-container *ngIf="isLoggedIn">
+        <a routerLink="/profile" class="w-9 h-9 bg-brand-400 rounded-full flex items-center justify-center text-surface-900 font-bold text-xs hover:scale-105 transition-transform shadow-sm">
+          {{ currentUserInitial }}
+        </a>
+        <button (click)="logout()" class="btn-ghost !text-accent-red hover:!text-red-700">Log Out</button>
+      </ng-container>
+    </div>
+    <div class="flex md:hidden items-center gap-2">
+      <button (click)="toggleDarkMode()" class="w-9 h-9 rounded-full flex items-center justify-center text-surface-400">
+        <svg *ngIf="!isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+        <svg *ngIf="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+      </button>
+      <button (click)="toggleMobileMenu()" class="text-surface-500 dark:text-surface-400">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path *ngIf="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <path *ngIf="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div *ngIf="mobileMenuOpen" class="absolute top-full left-0 right-0 bg-white dark:bg-surface-900 border-b border-surface-100 dark:border-surface-800 shadow-xl z-50 md:hidden">
+      <nav class="flex flex-col p-3 space-y-0.5">
+        <a routerLink="/films" (click)="mobileMenuOpen=false" routerLinkActive="bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-white"
+          class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Films</a>
+        <a routerLink="/activity" (click)="mobileMenuOpen=false" routerLinkActive="bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-white"
+          class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Activity</a>
+        <a routerLink="/lists" (click)="mobileMenuOpen=false" routerLinkActive="bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-white"
+          class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Lists</a>
+        <a routerLink="/members" (click)="mobileMenuOpen=false" routerLinkActive="bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-white"
+          class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Members</a>
+        <ng-container *ngIf="isLoggedIn">
+          <a routerLink="/feed" (click)="mobileMenuOpen=false" class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Feed</a>
+          <a routerLink="/profile" (click)="mobileMenuOpen=false" class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Profile</a>
+          <div class="border-t border-surface-100 dark:border-surface-800 my-2"></div>
+          <a (click)="logout(); mobileMenuOpen=false" class="text-accent-red px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer">Log Out</a>
+        </ng-container>
+        <ng-container *ngIf="!isLoggedIn">
+          <div class="border-t border-surface-100 dark:border-surface-800 my-2"></div>
+          <a routerLink="/login" (click)="mobileMenuOpen=false" class="text-surface-600 dark:text-surface-400 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">Sign In</a>
+          <a routerLink="/register" (click)="mobileMenuOpen=false" class="btn-primary text-center !rounded-xl mt-1">Join Letterboxd</a>
+        </ng-container>
+      </nav>
     </div>
   </div>
-
-  <!-- Hamburger button -->
-  <button (click)="toggleMobileMenu()" class="md:hidden text-gray-700">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path *ngIf="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M4 6h16M4 12h16M4 18h16" />
-      <path *ngIf="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  </button>
-
-  <!-- Mobile menu -->
-  <div *ngIf="mobileMenuOpen"
-    class="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 md:hidden">
-    <nav class="flex flex-col p-6 space-y-4 text-sm font-bold tracking-widest uppercase">
-      <a routerLink="/films" (click)="mobileMenuOpen=false" class="text-gray-700">Films</a>
-      <a routerLink="/lists" (click)="mobileMenuOpen=false" class="text-gray-700">Lists</a>
-      <a routerLink="/members" (click)="mobileMenuOpen=false" class="text-gray-700">Members</a>
-      <ng-container *ngIf="isLoggedIn">
-        <a routerLink="/profile" (click)="mobileMenuOpen=false" class="text-gray-700">Profile</a>
-        <a routerLink="/feed" (click)="mobileMenuOpen=false" class="text-gray-700">Feed</a>
-        <a (click)="logout(); mobileMenuOpen=false" class="text-red-500 cursor-pointer">Log Out</a>
-      </ng-container>
-      <ng-container *ngIf="!isLoggedIn">
-        <a routerLink="/login" (click)="mobileMenuOpen=false"
-          class="bg-figma-yellow px-4 py-2 rounded text-black text-center">Sign In</a>
-        <a routerLink="/register" (click)="mobileMenuOpen=false" class="text-gray-500">Create Account</a>
-      </ng-container>
-    </nav>
-  </div>
-
 </header>
 
 <app-toast></app-toast>
 
-<main class="max-w-6xl mx-auto p-8">
+<main class="max-w-6xl mx-auto px-6 py-8 min-h-screen">
   <router-outlet></router-outlet>
 </main>
 
-<main class="max-w-6xl mx-auto p-8">
-  <router-outlet></router-outlet>
-</main>
-
-<app-toast></app-toast>
+<footer class="border-t border-surface-100 dark:border-surface-800 mt-16 py-10 text-center">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <div class="w-6 h-6 bg-brand-400 rounded-md flex items-center justify-center">
+        <svg class="w-3 h-3 text-surface-900" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+        </svg>
+      </div>
+      <span class="text-sm font-bold text-surface-900 dark:text-white">Letterboxd</span>
+    </div>
+    <p class="text-xs text-surface-400 dark:text-surface-500">Projet PR71 — UTBM 2026</p>
+    <p class="text-xs text-surface-300 dark:text-surface-600 mt-1">Built with Angular & FastAPI</p>
+  </div>
+</footer>

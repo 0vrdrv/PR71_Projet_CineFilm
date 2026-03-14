@@ -11,6 +11,9 @@ import { AuthGuard } from './guards/auth.guard';
 import { ListsComponent } from './pages/lists/lists.component';
 import { ListDetailComponent } from './pages/list-detail/list-detail.component';
 import { FeedComponent } from './pages/feed/feed.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { ActivityComponent } from './pages/activity/activity.component';
+import { SearchComponent } from './pages/search/search.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,8 +26,10 @@ const routes: Routes = [
   { path: 'profile/:id', component: ProfileComponent },
   { path: 'lists', component: ListsComponent },
   { path: 'lists/:id', component: ListDetailComponent },
-  { path: '**', redirectTo: '' },
   { path: 'feed', component: FeedComponent, canActivate: [AuthGuard] },
+  { path: 'activity', component: ActivityComponent },
+  { path: 'search', component: SearchComponent },
+  { path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({
